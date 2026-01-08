@@ -116,7 +116,7 @@ export function LoginPage() {
 
         {/* Footer */}
         <p className="text-center text-xs text-stone-400 mt-6">
-          Dashboard de Administracion - HeredIA OAMRA
+          Dashboard de Administracion - HeredIA DTI
         </p>
       </div>
     </div>
