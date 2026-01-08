@@ -12,13 +12,11 @@ type TextNode = {
 
 function parseInlineMarkdown(text: string): TextNode[] {
   const nodes: TextNode[] = []
-  // Regex para: **bold**, *italic*, `code`, [text](url), y URLs directas
   const regex = /(\*\*.*?\*\*|\*.*?\*|`.*?`|\[.*?\]\(.*?\)|https?:\/\/[^\s<>"\)]+)/g
   let lastIndex = 0
   let match
 
   while ((match = regex.exec(text)) !== null) {
-    // Add text before match
     if (match.index > lastIndex) {
       nodes.push({ type: 'text', content: text.slice(lastIndex, match.index) })
     }
@@ -31,20 +29,17 @@ function parseInlineMarkdown(text: string): TextNode[] {
     } else if (matched.startsWith('`') && matched.endsWith('`')) {
       nodes.push({ type: 'code', content: matched.slice(1, -1) })
     } else if (matched.startsWith('[')) {
-      // Markdown link: [text](url)
       const linkMatch = matched.match(/\[(.*?)\]\((.*?)\)/)
       if (linkMatch) {
         nodes.push({ type: 'link', content: linkMatch[1], url: linkMatch[2] })
       }
     } else if (matched.startsWith('http')) {
-      // URL directa
       nodes.push({ type: 'link', content: matched, url: matched })
     }
 
     lastIndex = regex.lastIndex
   }
 
-  // Add remaining text
   if (lastIndex < text.length) {
     nodes.push({ type: 'text', content: text.slice(lastIndex) })
   }
@@ -84,26 +79,26 @@ function renderNodes(nodes: TextNode[]): React.ReactNode {
 }
 
 export function MarkdownRenderer({ content }: MarkdownRendererProps) {
-  const lines = content.split('\n')
+  // Dividir por párrafos (doble salto de línea)
+  const paragraphs = content.split(/\n\n+/)
 
   return (
     <div className="prose prose-sm max-w-none">
-      {lines.map((line, index) => {
-        if (line.startsWith('- ')) {
+      {paragraphs.map((paragraph, index) => {
+        const trimmed = paragraph.trim()
+        if (trimmed === '') return null
+
+        if (trimmed.startsWith('- ')) {
           return (
             <li key={index} className="ml-4 text-sm leading-relaxed">
-              {renderNodes(parseInlineMarkdown(line.slice(2)))}
+              {renderNodes(parseInlineMarkdown(trimmed.slice(2)))}
             </li>
           )
         }
 
-        if (line.trim() === '') {
-          return <br key={index} />
-        }
-
         return (
-          <p key={index} className="text-sm leading-relaxed">
-            {renderNodes(parseInlineMarkdown(line))}
+          <p key={index} className="text-sm leading-relaxed mb-3">
+            {renderNodes(parseInlineMarkdown(trimmed))}
           </p>
         )
       })}

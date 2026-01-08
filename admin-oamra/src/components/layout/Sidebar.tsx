@@ -78,7 +78,7 @@ export function Sidebar() {
                   <NavLink
                     key={item.path}
                     to={item.path}
-                    end={item.end}
+                    end={'end' in item ? item.end : undefined}
                     className={({ isActive }) =>
                       cn(
                         'flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-lg transition-all duration-200',

@@ -7,10 +7,11 @@ import type { Message } from '../types'
 interface ChatWindowProps {
   messages: Message[]
   onSendMessage: (content: string) => void
+  onSendFeedback: (messageId: string, tipo: 'like' | 'dislike', motivo?: string) => Promise<boolean>
   isLoading?: boolean
 }
 
-export function ChatWindow({ messages, onSendMessage, isLoading = false }: ChatWindowProps) {
+export function ChatWindow({ messages, onSendMessage, onSendFeedback, isLoading = false }: ChatWindowProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -22,7 +23,7 @@ export function ChatWindow({ messages, onSendMessage, isLoading = false }: ChatW
       <div className="flex-1 overflow-y-auto px-4 py-6">
         <div className="mx-auto max-w-3xl space-y-6">
           {messages.map((message) => (
-            <ChatMessage key={message.id} message={message} />
+            <ChatMessage key={message.id} message={message} onSendFeedback={onSendFeedback} />
           ))}
 
           {isLoading && (
